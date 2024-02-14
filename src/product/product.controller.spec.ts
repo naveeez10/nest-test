@@ -23,4 +23,13 @@ describe('ProductController', () => {
       }),
     ).toMatchObject({ productName: 'Product A', price: 420, id: '1' });
   });
+
+  it('should return list of products', () => {
+    const request = {
+      price: 420,
+      productName: 'Product A',
+    };
+    controller.addProduct(request);
+    expect(controller.getProducts()).toMatchObject([{ id: '1', ...request }]);
+  });
 });

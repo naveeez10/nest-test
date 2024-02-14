@@ -14,8 +14,17 @@ describe('ProductController (e2e)', () => {
     await app.init();
   });
 
-  it('Get (/product)', () => {
-    return request(app.getHttpServer()).get('/products').expect(200).expect([]);
+  it('Get (/product)', async () => {
+    const newProduct = { productName: 'Product A', price: 100 };
+    await request(app.getHttpServer())
+      .post('/products')
+      .send(newProduct)
+      .expect(201);
+    const response = await request(app.getHttpServer())
+      .get('/products')
+      .expect(200);
+
+    expect(response.body).toMatchObject([newProduct]);
   });
 
   it('Post (/products)', async () => {

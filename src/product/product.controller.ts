@@ -4,13 +4,14 @@ import ProductResponseDTO from './ProductResponseDTO';
 
 @Controller('products')
 export class ProductController {
+  private products = [];
   @Get()
   getProducts() {
-    return [];
+    return this.products;
   }
-
   @Post()
   addProduct(@Body() request: ProductRequestDTO): ProductResponseDTO {
+    this.products.push({ id: '1', ...request });
     return { id: '1', ...request };
   }
 }

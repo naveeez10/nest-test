@@ -1,17 +1,20 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ProductRequestDTO } from './ProductRequestDTO';
 import ProductResponseDTO from './ProductResponseDTO';
+import { ProductService } from './product.service';
 
 @Controller('products')
 export class ProductController {
-  private products = [];
+  private readonly service: ProductService;
+  constructor(service: ProductService) {
+    this.service = service;
+  }
   @Get()
-  getProducts() {
-    return this.products;
+  getProducts(): ProductResponseDTO[] {
+    return this.service.getProducts();
   }
   @Post()
   addProduct(@Body() request: ProductRequestDTO): ProductResponseDTO {
-    this.products.push({ id: '1', ...request });
-    return { id: '1', ...request };
+    return this.service.addProduct(request);
   }
 }

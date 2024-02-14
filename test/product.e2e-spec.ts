@@ -16,15 +16,16 @@ describe('ProductController (e2e)', () => {
 
   it('Get (/product)', async () => {
     const newProduct = { productName: 'Product A', price: 100 };
-    await request(app.getHttpServer())
+    const expectedResponse = await request(app.getHttpServer())
       .post('/products')
       .send(newProduct)
       .expect(201);
+
     const response = await request(app.getHttpServer())
       .get('/products')
       .expect(200);
 
-    expect(response.body).toMatchObject([newProduct]);
+    expect(response.body).toMatchObject([expectedResponse.body]);
   });
 
   it('Post (/products)', async () => {

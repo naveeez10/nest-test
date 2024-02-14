@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { mockDeep } from 'jest-mock-extended';
+import { any, anyNumber, mockDeep } from 'jest-mock-extended';
 import { ProductRequestDTO } from './ProductRequestDTO';
 
 describe('ProductController', () => {
@@ -22,9 +22,9 @@ describe('ProductController', () => {
     expect(controller.getProducts()).toMatchObject([]);
     expect(service.getProducts).toHaveBeenCalled();
   });
-  it('should add a new product', () => {
-    service.addProduct.mockReturnValue({
-      id: '1',
+  it('should add a new product', async () => {
+    service.addProduct.mockResolvedValue({
+      id: expect.any(Number),
       productName: 'Product A',
       price: 420,
     });
@@ -33,10 +33,10 @@ describe('ProductController', () => {
       price: 420,
       productName: 'Product A',
     };
-    expect(controller.addProduct(requestedProduct)).toMatchObject({
+    expect(await controller.addProduct(requestedProduct)).toMatchObject({
       productName: 'Product A',
       price: 420,
-      id: '1',
+      id: expect.any(Number),
     });
 
     expect(service.addProduct).toHaveBeenCalledWith(requestedProduct);
@@ -47,9 +47,9 @@ describe('ProductController', () => {
       price: 420,
       productName: 'Product A',
     };
-    service.getProducts.mockReturnValue([{ id: '1', ...request }]);
+    service.getProducts.mockReturnValue([{ id: 1, ...request }]);
     controller.addProduct(request);
-    expect(controller.getProducts()).toMatchObject([{ id: '1', ...request }]);
+    expect(controller.getProducts()).toMatchObject([{ id: 1, ...request }]);
     expect(service.getProducts).toHaveBeenCalled();
   });
 });

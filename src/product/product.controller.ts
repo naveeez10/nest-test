@@ -14,7 +14,9 @@ export class ProductController {
     return this.service.getProducts();
   }
   @Post()
-  addProduct(@Body() request: ProductRequestDTO): ProductResponseDTO {
-    return this.service.addProduct(request);
+  async addProduct(
+    @Body() request: ProductRequestDTO,
+  ): Promise<ProductResponseDTO> {
+    return await this.service.addProduct(request);
   }
 }

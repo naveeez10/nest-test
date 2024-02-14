@@ -1,5 +1,5 @@
 export default interface ProductResponseDTO {
-  id: string;
+  id: number;
   productName: string;
   price: number;
 }

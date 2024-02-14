@@ -2,30 +2,43 @@ import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
+import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('ProductController (e2e)', () => {
   let app: INestApplication;
+  let prismaService: PrismaService;
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
+    prismaService = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
+  });
+
+  afterEach(async () => {
+    await prismaService.product.deleteMany();
   });
 
   it('Get (/product)', async () => {
     const newProduct = { productName: 'Product A', price: 100 };
-    const expectedResponse = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .post('/products')
       .send(newProduct)
       .expect(201);
+
+    const expectedResponse = {
+      id: expect.any(Number),
+      productName: 'Product A',
+      price: 100,
+    };
 
     const response = await request(app.getHttpServer())
       .get('/products')
       .expect(200);
 
-    expect(response.body).toMatchObject([expectedResponse.body]);
+    expect(response.body).toMatchObject([expectedResponse]);
   });
 
   it('Post (/products)', async () => {
@@ -34,10 +47,14 @@ describe('ProductController (e2e)', () => {
       .send({ productName: 'Product A', price: 100 })
       .expect(201);
 
-    expect(response.body).toMatchObject({
-      id: '1',
+    const expectedResponse = {
+      id: expect.any(Number),
       productName: 'Product A',
       price: 100,
+    };
+    expect(response.body).toMatchObject(expectedResponse);
+    await prismaService.product.findMany().then((products) => {
+      expect(products).toMatchObject([expectedResponse]);
     });
   });
 });

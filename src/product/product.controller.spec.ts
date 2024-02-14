@@ -15,4 +15,12 @@ describe('ProductController', () => {
   it('should return empty array', () => {
     expect(controller.getProducts()).toMatchObject([]);
   });
+  it('should add a new product', () => {
+    expect(
+      controller.addProduct({
+        price: 420,
+        productName: 'Product A',
+      }),
+    ).toMatchObject({ productName: 'Product A', price: 420, id: '1' });
+  });
 });

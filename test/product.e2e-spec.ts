@@ -17,4 +17,17 @@ describe('ProductController (e2e)', () => {
   it('Get (/product)', () => {
     return request(app.getHttpServer()).get('/products').expect(200).expect([]);
   });
+
+  it('Post (/products)', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/products')
+      .send({ productName: 'Product A', price: 100 })
+      .expect(201);
+
+    expect(response.body).toMatchObject({
+      id: '1',
+      productName: 'Product A',
+      price: 100,
+    });
+  });
 });

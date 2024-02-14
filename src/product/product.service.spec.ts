@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from './product.service';
+import ProductResponseDTO from './ProductResponseDTO';
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -22,5 +23,18 @@ describe('ProductService', () => {
       productName: 'Product A',
     };
     expect(service.addProduct(request)).toMatchObject({ id: '1', ...request });
+  });
+
+  it('should return empty array', () => {
+    expect(service.getProducts()).toMatchObject([]);
+  });
+
+  it('should return list of products', () => {
+    const request = {
+      price: 420,
+      productName: 'Product A',
+    };
+    const addedProduct: ProductResponseDTO = service.addProduct(request);
+    expect(service.getProducts()).toMatchObject([addedProduct]);
   });
 });

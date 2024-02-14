@@ -12,7 +12,7 @@ describe('ProductController', () => {
     controller = module.get<ProductController>(ProductController);
   });
 
-  it('should return hello world', () => {
-    expect(controller.getProducts()).toBe('Hello World!');
+  it('should return empty array', () => {
+    expect(controller.getProducts()).toMatchObject([]);
   });
 });

@@ -17,17 +17,21 @@ describe('OrderController', () => {
     await app.init();
   });
 
+  afterEach(async () => {
+    await prismaService.order.deleteMany();
+  });
+
   it('/order POST', async () => {
     const response = await request(app.getHttpServer())
       .post('/order')
       .send({
-        productID: 1,
+        productId: 1,
         quantity: 1,
       })
       .expect(201);
     expect(response.body).toMatchObject({
       id: expect.any(Number),
-      productID: 1,
+      productId: 1,
       quantity: 1,
     });
 
@@ -35,7 +39,7 @@ describe('OrderController', () => {
       expect(orders).toMatchObject([
         {
           id: expect.any(Number),
-          productID: 1,
+          productId: 1,
           quantity: 1,
         },
       ]);

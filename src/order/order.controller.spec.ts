@@ -16,13 +16,13 @@ describe('OrderController', () => {
     controller = module.get<OrderController>(OrderController);
   });
 
-  it('should add order', () => {
+  it('should add order', async () => {
     const request = {
-      productID: 1,
+      productId: 1,
       quantity: 1,
     };
-    service.addOrder.mockReturnValue({ id: 1, ...request });
-    expect(controller.addOrder(request)).toMatchObject({
+    service.addOrder.mockResolvedValueOnce({ id: 1, ...request });
+    expect(await controller.addOrder(request)).toMatchObject({
       id: expect.any(Number),
       ...request,
     });

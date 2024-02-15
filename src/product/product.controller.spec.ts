@@ -17,9 +17,9 @@ describe('ProductController', () => {
     controller = module.get<ProductController>(ProductController);
   });
 
-  it('should return empty array', () => {
-    service.getProducts.mockReturnValue([]);
-    expect(controller.getProducts()).toMatchObject([]);
+  it('should return empty array', async () => {
+    service.getProducts.mockResolvedValue([]);
+    expect(await controller.getProducts()).toMatchObject([]);
     expect(service.getProducts).toHaveBeenCalled();
   });
   it('should add a new product', async () => {
@@ -42,14 +42,16 @@ describe('ProductController', () => {
     expect(service.addProduct).toHaveBeenCalledWith(requestedProduct);
   });
 
-  it('should return list of products', () => {
+  it('should return list of products', async () => {
     const request = {
       price: 420,
       productName: 'Product A',
     };
-    service.getProducts.mockReturnValue([{ id: 1, ...request }]);
-    controller.addProduct(request);
-    expect(controller.getProducts()).toMatchObject([{ id: 1, ...request }]);
+    service.getProducts.mockResolvedValue([{ id: 1, ...request }]);
+    await controller.addProduct(request);
+    expect(await controller.getProducts()).toMatchObject([
+      { id: 1, ...request },
+    ]);
     expect(service.getProducts).toHaveBeenCalled();
   });
 });

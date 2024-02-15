@@ -46,8 +46,9 @@ describe('ProductService', () => {
     });
   });
 
-  it('should return empty array', () => {
-    expect(service.getProducts()).toMatchObject([]);
+  it('should return empty array', async () => {
+    prismaService.product.findMany.mockResolvedValueOnce([]);
+    expect(await service.getProducts()).toMatchObject([]);
   });
 
   it('should return list of products', async () => {
@@ -56,6 +57,10 @@ describe('ProductService', () => {
       productName: 'Product A',
     };
     const addedProduct: ProductResponseDTO = await service.addProduct(request);
-    expect(service.getProducts()).toMatchObject([addedProduct]);
+    prismaService.product.findMany.mockResolvedValueOnce([addedProduct]);
+    expect(await service.getProducts()).toMatchObject([addedProduct]);
+    expect(prismaService.product.create).toHaveBeenCalledWith({
+      data: request,
+    });
   });
 });

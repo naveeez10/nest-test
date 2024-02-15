@@ -10,8 +10,8 @@ export class ProductController {
     this.service = service;
   }
   @Get()
-  getProducts(): ProductResponseDTO[] {
-    return this.service.getProducts();
+  async getProducts(): Promise<ProductResponseDTO[]> {
+    return await this.service.getProducts();
   }
   @Post()
   async addProduct(

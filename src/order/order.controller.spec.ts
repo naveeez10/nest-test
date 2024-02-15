@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { mockDeep } from 'jest-mock-extended';
+import { Product } from '@prisma/client';
 
 describe('OrderController', () => {
   let controller: OrderController;
@@ -21,7 +22,17 @@ describe('OrderController', () => {
       productId: 1,
       quantity: 1,
     };
-    service.addOrder.mockResolvedValueOnce({ id: 1, ...request });
+    const createdProduct = {
+      id: 1,
+      productName: 'productA',
+      price: 100,
+    };
+    const createdOrder = {
+      id: 1,
+      product: createdProduct,
+      ...request,
+    };
+    service.addOrder.mockResolvedValueOnce(createdOrder);
     expect(await controller.addOrder(request)).toMatchObject({
       id: expect.any(Number),
       ...request,
@@ -30,8 +41,20 @@ describe('OrderController', () => {
   });
 
   it('should get orders', async () => {
-    service.getOrders.mockResolvedValueOnce([]);
-    expect(await controller.getOrders()).toMatchObject([]);
+    const product: Product = { id: 1, productName: 'product', price: 100 };
+    const order = {
+      id: 1,
+      quantity: 1,
+      product,
+    };
+    service.getOrders.mockResolvedValueOnce([order]);
+    expect(await controller.getOrders()).toMatchObject([
+      {
+        id: order.id,
+        quantity: order.quantity,
+        product: order.product,
+      },
+    ]);
     expect(service.getOrders).toHaveBeenCalled();
   });
 });

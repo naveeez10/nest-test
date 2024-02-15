@@ -19,31 +19,40 @@ describe('OrderController', () => {
 
   afterEach(async () => {
     await prismaService.order.deleteMany();
+    await prismaService.product.deleteMany();
   });
 
   it('/order POST', async () => {
+    const createdProduct = await prismaService.product.create({
+      data: {
+        productName: 'product1',
+        price: 100,
+      },
+    });
     const response = await request(app.getHttpServer())
       .post('/order')
       .send({
-        productId: 1,
+        productId: createdProduct.id,
         quantity: 1,
       })
       .expect(201);
     expect(response.body).toMatchObject({
       id: expect.any(Number),
-      productId: 1,
+      product: createdProduct,
       quantity: 1,
     });
 
-    await prismaService.order.findMany().then((orders) => {
-      expect(orders).toMatchObject([
-        {
-          id: expect.any(Number),
-          productId: 1,
-          quantity: 1,
-        },
-      ]);
-    });
+    await prismaService.order
+      .findMany({ include: { product: true } })
+      .then((orders) => {
+        expect(orders).toMatchObject([
+          {
+            id: expect.any(Number),
+            product: createdProduct,
+            quantity: 1,
+          },
+        ]);
+      });
   });
 
   it('/order GET', async () => {

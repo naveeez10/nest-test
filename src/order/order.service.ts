@@ -7,10 +7,28 @@ import { PrismaService } from '../prisma/prisma.service';
 export class OrderService {
   constructor(private readonly prismaService: PrismaService) {}
   async addOrder(request: OrderRequestDTO): Promise<OrderResponseDTO> {
-    return this.prismaService.order.create({ data: request });
+    const addedOrderResponse = await this.prismaService.order.create({
+      data: request,
+      include: { product: true },
+    });
+
+    return {
+      id: addedOrderResponse.id,
+      product: addedOrderResponse.product,
+      quantity: addedOrderResponse.quantity,
+    };
   }
 
   async getOrders(): Promise<OrderResponseDTO[]> {
-    return this.prismaService.order.findMany();
+    const ordersResponse = this.prismaService.order.findMany({
+      include: { product: true },
+    });
+    return (await ordersResponse).map((order) => {
+      return {
+        id: order.id,
+        product: order.product,
+        quantity: order.quantity,
+      };
+    });
   }
 }

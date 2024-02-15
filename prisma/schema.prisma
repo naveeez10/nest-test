@@ -11,13 +11,15 @@ datasource db {
 }
 
 model Product {
-    id Int @id @default(autoincrement())
-    productName String
-    price Float
+  id          Int     @id @default(autoincrement())
+  productName String
+  price       Float
+  Order       Order[]
 }
 
 model Order {
-  id Int @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   productId Int
-  quantity Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
 }

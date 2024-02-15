@@ -4,6 +4,9 @@ import { AppModule } from '../src/app.module';
 import * as request from 'supertest';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { OrderRequestDTO } from '../src/order/orderRequestDTO';
+import { Product } from '@prisma/client';
+import { ProductRequestDTO } from '../src/product/ProductRequestDTO';
+import { OrderResponseDTO } from '../src/order/orderResponseDTO';
 
 describe('OrderController', () => {
   let app: INestApplication;
@@ -20,43 +23,63 @@ describe('OrderController', () => {
 
   afterEach(async () => {
     await prismaService.order.deleteMany();
+    await prismaService.product.deleteMany();
   });
 
   it('/order GET', async () => {
-    const orderRequest: OrderRequestDTO = { productId: 1, quantity: 1 };
-    await prismaService.order.create({ data: orderRequest });
+    const productToCreate: ProductRequestDTO = {
+      productName: 'test',
+      price: 1,
+    };
+    const addedProduct: Product = await prismaService.product.create({
+      data: productToCreate,
+    });
+    const orderRequest: OrderRequestDTO = {
+      productId: addedProduct.id,
+      quantity: 1,
+    };
+
+    await prismaService.order.create({
+      data: {
+        ...orderRequest,
+      },
+    });
 
     const response = await request(app.getHttpServer())
       .get('/order')
       .expect(200);
 
-    expect(response.body).toMatchObject([
-      { id: expect.any(Number), ...orderRequest },
-    ]);
+    const expectedResponse: OrderResponseDTO = {
+      id: expect.any(Number),
+      product: addedProduct,
+      quantity: orderRequest.quantity,
+    };
+    expect(response.body).toStrictEqual([expectedResponse]);
   });
 
   it('/order POST', async () => {
+    const existingProduct = await prismaService.product.create({
+      data: {
+        productName: 'test',
+        price: 1,
+      },
+    });
     const response = await request(app.getHttpServer())
       .post('/order')
       .send({
-        productId: 1,
+        productId: existingProduct.id,
         quantity: 1,
       })
       .expect(201);
-    expect(response.body).toMatchObject({
-      id: expect.any(Number),
-      productId: 1,
-      quantity: 1,
-    });
 
-    const expectedResponse = {
+    const expectedResponse: OrderResponseDTO = {
       id: expect.any(Number),
-      productId: 1,
+      product: existingProduct,
       quantity: 1,
     };
-
-    expect(await prismaService.order.findMany()).toMatchObject([
-      expectedResponse,
-    ]);
+    expect(response.body).toMatchObject(expectedResponse);
+    expect(
+      await prismaService.order.findMany({ include: { product: true } }),
+    ).toMatchObject([expectedResponse]);
   });
 });

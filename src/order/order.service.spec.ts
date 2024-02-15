@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { mockDeep } from 'jest-mock-extended';
 import { OrderResponseDTO } from './orderResponseDTO';
 import { OrderRequestDTO } from './orderRequestDTO';
+import { Product } from '@prisma/client';
 
 describe('OrderService', () => {
   let service: OrderService;
@@ -27,36 +28,61 @@ describe('OrderService', () => {
   });
 
   it('should return all the orders', async () => {
-    const orderResponse: OrderResponseDTO[] = [
+    const productToAdd: Product = {
+      id: 1,
+      productName: 'test',
+      price: 1,
+    };
+    const orderResponse = [
       {
         id: 1,
-        productId: 1,
+        product: productToAdd,
+        productId: productToAdd.id,
         quantity: 1,
       },
     ];
     prismaService.order.findMany.mockResolvedValueOnce(orderResponse);
     const response = await service.getOrders();
     expect(prismaService.order.findMany).toHaveBeenCalled();
-    expect(response).toMatchObject(orderResponse);
+    expect(response).toMatchObject([
+      {
+        id: expect.any(Number),
+        product: productToAdd,
+        quantity: 1,
+      },
+    ]);
   });
 
   it('should add order', async () => {
+    const productToAdd: Product = {
+      id: 1,
+      productName: 'test',
+      price: 1,
+    };
     const request: OrderRequestDTO = {
-      productId: 1,
+      productId: productToAdd.id,
       quantity: 1,
     };
-    const orderResponse: OrderResponseDTO = {
+    const orderResponse = {
       id: 123,
-      ...request,
+      product: productToAdd,
+      productId: productToAdd.id,
+      quantity: 1,
     };
     prismaService.order.create.mockResolvedValueOnce(orderResponse);
 
     const response: OrderResponseDTO = await service.addOrder(request);
 
-    expect(prismaService.order.create).toHaveBeenCalledWith({ data: request });
-    expect(response).toMatchObject({
+    const expectedResponse: OrderResponseDTO = {
       id: expect.any(Number),
-      ...request,
+      product: productToAdd,
+      quantity: 1,
+    };
+
+    expect(prismaService.order.create).toHaveBeenCalledWith({
+      data: request,
+      include: { product: true },
     });
+    expect(response).toStrictEqual(expectedResponse);
   });
 });

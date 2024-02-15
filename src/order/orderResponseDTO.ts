@@ -1,5 +1,7 @@
+import { Product } from '@prisma/client';
+
 export interface OrderResponseDTO {
   id: number;
   quantity: number;
-  productId: number;
+  product: Product;
 }

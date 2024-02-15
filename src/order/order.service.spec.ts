@@ -20,6 +20,26 @@ describe('OrderService', () => {
     service = module.get<OrderService>(OrderService);
   });
 
+  it('should get empty list when no orders exist', async () => {
+    prismaService.order.findMany.mockResolvedValueOnce([]);
+    const orders = await service.getOrders();
+    expect(orders).toMatchObject([]);
+  });
+
+  it('should return all the orders', async () => {
+    const orderResponse: OrderResponseDTO[] = [
+      {
+        id: 1,
+        productId: 1,
+        quantity: 1,
+      },
+    ];
+    prismaService.order.findMany.mockResolvedValueOnce(orderResponse);
+    const response = await service.getOrders();
+    expect(prismaService.order.findMany).toHaveBeenCalled();
+    expect(response).toMatchObject(orderResponse);
+  });
+
   it('should add order', async () => {
     const request: OrderRequestDTO = {
       productId: 1,

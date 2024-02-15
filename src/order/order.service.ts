@@ -9,4 +9,8 @@ export class OrderService {
   async addOrder(request: OrderRequestDTO): Promise<OrderResponseDTO> {
     return this.prismaService.order.create({ data: request });
   }
+
+  async getOrders(): Promise<OrderResponseDTO[]> {
+    return this.prismaService.order.findMany();
+  }
 }

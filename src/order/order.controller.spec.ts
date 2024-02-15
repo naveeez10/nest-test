@@ -16,6 +16,13 @@ describe('OrderController', () => {
     controller = module.get<OrderController>(OrderController);
   });
 
+  it('should get empty list when no orders exist', async () => {
+    service.getOrders.mockResolvedValueOnce([]);
+    const response = await controller.getOrders();
+    expect(service.getOrders).toHaveBeenCalled();
+    expect(response).toMatchObject([]);
+  });
+
   it('should add order', async () => {
     const request = {
       productId: 1,

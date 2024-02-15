@@ -30,4 +30,10 @@ describe('OrderService', () => {
     });
     expect(prismaService.order.create).toHaveBeenCalledWith({ data: request });
   });
+
+  it('should get orders', async () => {
+    prismaService.order.findMany.mockResolvedValueOnce([]);
+    expect(await service.getOrders()).toMatchObject([]);
+    expect(prismaService.order.findMany).toHaveBeenCalled();
+  });
 });

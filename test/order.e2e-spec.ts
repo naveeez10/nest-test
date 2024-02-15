@@ -45,4 +45,14 @@ describe('OrderController', () => {
       ]);
     });
   });
+
+  it('/order GET', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/order')
+      .expect(200);
+
+    const expectedResponse = [];
+
+    expect(response.body).toMatchObject(expectedResponse);
+  });
 });

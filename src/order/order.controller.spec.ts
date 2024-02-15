@@ -28,4 +28,10 @@ describe('OrderController', () => {
     });
     expect(service.addOrder).toHaveBeenCalledWith(request);
   });
+
+  it('should get orders', async () => {
+    service.getOrders.mockResolvedValueOnce([]);
+    expect(await controller.getOrders()).toMatchObject([]);
+    expect(service.getOrders).toHaveBeenCalled();
+  });
 });

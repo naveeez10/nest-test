@@ -2,6 +2,7 @@ import { ProductRequestDTO } from './ProductRequestDTO';
 import { Test, TestingModule } from '@nestjs/testing';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
+import { HttpException } from '@nestjs/common';
 
 describe('ProductRequestDTO', () => {
   beforeEach(async () => {

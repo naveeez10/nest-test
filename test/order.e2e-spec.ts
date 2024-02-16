@@ -66,7 +66,7 @@ describe('OrderController', () => {
     expect(response.body).toMatchObject(expectedResponse);
   });
 
-  it('/order POST', async () => {
+  it('/order POST should return status code 400 when product does not exist', async () => {
     const response = await request(app.getHttpServer())
       .post('/order')
       .send({

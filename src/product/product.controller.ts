@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Post, UseFilters } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { ProductRequestDTO } from './ProductRequestDTO';
 import ProductResponseDTO from './ProductResponseDTO';
 import { ProductService } from './product.service';
-import { ProductInternalServerErrorException } from '../filter/product-internal-server-exception.filter';
+import { OrderLoggerInterceptor } from '../interceptors/order-logger.interceptor';
 
 @Controller('products')
-@UseFilters(ProductInternalServerErrorException)
+// @UseFilters(ProductInternalServerErrorException)
 export class ProductController {
   private readonly service: ProductService;
   constructor(service: ProductService) {

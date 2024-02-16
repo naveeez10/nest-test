@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
@@ -13,6 +13,7 @@ describe('ProductController (e2e)', () => {
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
     prismaService = moduleFixture.get<PrismaService>(PrismaService);
     await app.init();
   });

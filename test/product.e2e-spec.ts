@@ -57,4 +57,21 @@ describe('ProductController (e2e)', () => {
       expect(products).toMatchObject([expectedResponse]);
     });
   });
+
+  it('Post (/products) - should throw exception if price is not a number', async () => {
+    const productToAdd = { productName: 'Product A', price: '100' };
+
+    const response = await request(app.getHttpServer())
+      .post('/products')
+      .send(productToAdd)
+      .expect(400);
+
+    expect(response.body).toMatchObject({
+      statusCode: 400,
+      message: ['Price must be a number'], // class validator pipe returns error message in array [ref: ProductRequestDTO & ProductController]
+      error: 'Bad Request',
+    });
+  });
+
+  // checks that name of product is string of less than 50 characters
 });

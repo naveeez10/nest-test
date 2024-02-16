@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { any, anyNumber, mockDeep } from 'jest-mock-extended';
+import { mockDeep } from 'jest-mock-extended';
 import { ProductRequestDTO } from './ProductRequestDTO';
-import { BadRequestException } from '@nestjs/common';
 
 describe('ProductController', () => {
   let controller: ProductController;

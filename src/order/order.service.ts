@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OrderRequestDTO } from './orderRequestDTO';
 import { OrderResponseDTO } from './orderResponseDTO';
 import { PrismaService } from '../prisma/prisma.service';
@@ -7,11 +7,16 @@ import { PrismaService } from '../prisma/prisma.service';
 export class OrderService {
   constructor(private readonly prismaService: PrismaService) {}
   async addOrder(request: OrderRequestDTO): Promise<OrderResponseDTO> {
+    await this.verifyProductExists(request.productId);
     const addedOrderResponse = await this.prismaService.order.create({
       data: request,
       include: { product: true },
     });
 
+    return this.transformToResponseDTO(addedOrderResponse);
+  }
+
+  private transformToResponseDTO(addedOrderResponse: OrderResponseDTO) {
     return {
       id: addedOrderResponse.id,
       product: addedOrderResponse.product,
@@ -19,16 +24,21 @@ export class OrderService {
     };
   }
 
+  private async verifyProductExists(productId: number) {
+    const existingProduct = await this.prismaService.product.findUnique({
+      where: { id: productId },
+    });
+    if (!existingProduct) {
+      throw new BadRequestException('Product not found');
+    }
+  }
+
   async getOrders(): Promise<OrderResponseDTO[]> {
     const ordersResponse = this.prismaService.order.findMany({
       include: { product: true },
     });
-    return (await ordersResponse).map((order) => {
-      return {
-        id: order.id,
-        product: order.product,
-        quantity: order.quantity,
-      };
-    });
+    return (await ordersResponse).map((order) =>
+      this.transformToResponseDTO(order),
+    );
   }
 }

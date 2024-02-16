@@ -5,6 +5,7 @@ import { mockDeep } from 'jest-mock-extended';
 import { OrderResponseDTO } from './orderResponseDTO';
 import { OrderRequestDTO } from './orderRequestDTO';
 import { Product } from '@prisma/client';
+import { BadRequestException } from '@nestjs/common';
 
 describe('OrderService', () => {
   let service: OrderService;
@@ -66,11 +67,10 @@ describe('OrderService', () => {
     const orderResponse = {
       id: 123,
       product: productToAdd,
-      productId: productToAdd.id,
-      quantity: 1,
+      ...request,
     };
     prismaService.order.create.mockResolvedValueOnce(orderResponse);
-
+    prismaService.product.findUnique.mockResolvedValueOnce(productToAdd);
     const response: OrderResponseDTO = await service.addOrder(request);
 
     const expectedResponse: OrderResponseDTO = {
@@ -84,5 +84,23 @@ describe('OrderService', () => {
       include: { product: true },
     });
     expect(response).toStrictEqual(expectedResponse);
+  });
+
+  it('should return error when product not found', async () => {
+    //arrange
+    const orderToAdd: OrderRequestDTO = {
+      productId: 1,
+      quantity: 1,
+    };
+
+    //action
+    const createOrder = service.addOrder(orderToAdd);
+
+    //assert
+    expect(prismaService.product.findUnique).toHaveBeenCalledWith({
+      where: { id: 1 },
+    });
+    await expect(createOrder).rejects.toThrow(BadRequestException);
+    await expect(createOrder).rejects.toThrow('Product not found');
   });
 });

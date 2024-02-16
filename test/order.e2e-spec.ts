@@ -82,4 +82,17 @@ describe('OrderController', () => {
       await prismaService.order.findMany({ include: { product: true } }),
     ).toMatchObject([expectedResponse]);
   });
+
+  it('/order POST (product not found)', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/order')
+      .send({ productId: 1, quantity: 1 })
+      .expect(400);
+
+    expect(response.body).toMatchObject({
+      message: 'Product not found',
+      statusCode: 400,
+      error: 'Bad Request',
+    });
+  });
 });

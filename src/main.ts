@@ -1,10 +1,12 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AllExceptionsFilterFilter } from './allExceptionsFilter.filter';
+import { AllExceptionsFilter } from './allExceptionsFilter';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new AllExceptionsFilterFilter(app.get(HttpAdapterHost)));
+  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
   await app.listen(3000);
 }
 bootstrap();

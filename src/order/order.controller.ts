@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, UseFilters } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { OrderRequestDTO } from './orderRequestDTO';
 import { OrderService } from './order.service';
-import { AllExceptionsFilterFilter } from '../allExceptionsFilter.filter';
+import { LoggingInterceptor } from '../loggingInterceptor.interceptor';
 
 @Controller('order')
 // @UseFilters(AllExceptionsFilterFilter)
@@ -9,6 +9,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
+  @UseInterceptors(LoggingInterceptor)
   addOrder(@Body() request: OrderRequestDTO) {
     return this.orderService.addOrder(request);
   }

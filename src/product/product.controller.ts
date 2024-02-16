@@ -15,7 +15,7 @@ export class ProductController {
   }
   @Post()
   async addProduct(
-    @Body(new ValidationPipe()) request: ProductRequestDTO,
+    @Body() request: ProductRequestDTO,
   ): Promise<ProductResponseDTO> {
     return await this.service.addProduct(request);
   }

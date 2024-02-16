@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { any, anyNumber, mockDeep } from 'jest-mock-extended';
+import { mockDeep } from 'jest-mock-extended';
 import { ProductRequestDTO } from './ProductRequestDTO';
 
 describe('ProductController', () => {
@@ -48,7 +48,9 @@ describe('ProductController', () => {
       productName: 'Product A',
     };
     service.getProducts.mockResolvedValue([{ id: 1, ...request }]);
+
     await controller.addProduct(request);
+
     expect(await controller.getProducts()).toMatchObject([
       { id: 1, ...request },
     ]);

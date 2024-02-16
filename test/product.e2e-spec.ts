@@ -73,5 +73,39 @@ describe('ProductController (e2e)', () => {
     });
   });
 
-  // checks that name of product is string of less than 50 characters
+  it('Post (/products) - should throw exception if productName is not a string', async () => {
+    const productToAdd = {
+      productName: 10,
+      price: 100,
+    };
+
+    const response = await request(app.getHttpServer())
+      .post('/products')
+      .send(productToAdd)
+      .expect(400);
+
+    expect(response.body).toMatchObject({
+      statusCode: 400,
+      error: 'Bad Request',
+    });
+    expect(response.body.message).toContain('Product name must be a string');
+  });
+
+  it('Post (/products) - should throw exception if productName is not a string of less than 50 characters', async () => {
+    const productToAdd = {
+      productName: 'Product_A'.repeat(10),
+      price: 100,
+    };
+
+    const response = await request(app.getHttpServer())
+      .post('/products')
+      .send(productToAdd)
+      .expect(400);
+
+    expect(response.body).toMatchObject({
+      statusCode: 400,
+      message: ['Product name must be less than 50 characters'],
+      error: 'Bad Request',
+    });
+  });
 });

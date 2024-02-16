@@ -36,6 +36,7 @@ describe('OrderController', () => {
         quantity: 1,
       })
       .expect(201);
+
     expect(response.body).toMatchObject({
       id: expect.any(Number),
       product: createdProduct,
@@ -63,5 +64,21 @@ describe('OrderController', () => {
     const expectedResponse = [];
 
     expect(response.body).toMatchObject(expectedResponse);
+  });
+
+  it('/order POST', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/order')
+      .send({
+        productId: 1,
+        quantity: 1,
+      })
+      .expect(400);
+
+    expect(response.body).toMatchObject({
+      statusCode: 400,
+      message: 'Product not found',
+      error: 'Bad Request',
+    });
   });
 });

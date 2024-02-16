@@ -2,10 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrderService } from './order.service';
 import { mockDeep } from 'jest-mock-extended';
 import { PrismaService } from '../prisma/prisma.service';
-import { ProductRequestDTO } from '../product/ProductRequestDTO';
 import { OrderRequestDTO } from './orderRequestDTO';
-import { OrderResponseDTO } from './orderResponseDTO';
 import { Product } from '@prisma/client';
+import { BadRequestException } from '@nestjs/common';
 
 describe('OrderService', () => {
   let service: OrderService;
@@ -38,6 +37,7 @@ describe('OrderService', () => {
       ...request,
     };
     prismaService.order.create.mockResolvedValueOnce(createdOrder);
+    prismaService.product.findUnique.mockResolvedValueOnce(createdProduct);
     expect(await service.addOrder(request)).toMatchObject({
       id: 1,
       quantity: request.quantity,
@@ -71,5 +71,21 @@ describe('OrderService', () => {
       },
     ]);
     expect(prismaService.order.findMany).toHaveBeenCalled();
+  });
+
+  it('should throw an error when product not found', async () => {
+    const request: OrderRequestDTO = {
+      productId: 1,
+      quantity: 1,
+    };
+
+    const response = service.addOrder(request);
+
+    expect(prismaService.product.findUnique).toHaveBeenCalledWith({
+      where: { id: request.productId },
+    });
+
+    await expect(response).rejects.toThrow(BadRequestException);
+    await expect(response).rejects.toThrow('Product not found');
   });
 });

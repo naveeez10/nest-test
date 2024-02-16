@@ -57,4 +57,16 @@ describe('ProductController (e2e)', () => {
       expect(products).toMatchObject([expectedResponse]);
     });
   });
+
+  it('/products (POST) should throw exception while invalid price is not a number', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/products')
+      .send({ productName: 'Product A', price: 'abc' })
+      .expect(400);
+    expect(response.body).toMatchObject({
+      statusCode: 400,
+      message: ['Product price must be a number'],
+      error: 'Bad Request',
+    });
+  });
 });

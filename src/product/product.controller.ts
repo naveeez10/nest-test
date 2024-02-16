@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
 import { ProductRequestDTO } from './ProductRequestDTO';
 import ProductResponseDTO from './ProductResponseDTO';
 import { ProductService } from './product.service';
@@ -15,7 +15,8 @@ export class ProductController {
   }
   @Post()
   async addProduct(
-    @Body() request: ProductRequestDTO,
+    @Body(new ValidationPipe())
+    request: ProductRequestDTO,
   ): Promise<ProductResponseDTO> {
     return await this.service.addProduct(request);
   }

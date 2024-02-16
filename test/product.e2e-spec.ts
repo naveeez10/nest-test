@@ -58,7 +58,7 @@ describe('ProductController (e2e)', () => {
     });
   });
 
-  it('/products (POST) should throw exception while invalid price is not a number', async () => {
+  it('/products (POST) should throw exception when price is not a number', async () => {
     const response = await request(app.getHttpServer())
       .post('/products')
       .send({ productName: 'Product A', price: 'abc' })
@@ -66,6 +66,55 @@ describe('ProductController (e2e)', () => {
     expect(response.body).toMatchObject({
       statusCode: 400,
       message: ['Product price must be a number'],
+      error: 'Bad Request',
+    });
+  });
+
+  // create a test for string productName.length < 50 & It should be string
+  it('/products (POST) should throw exception when productName is not a string', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/products')
+      .send({ productName: 123, price: 100 })
+      .expect(400);
+    expect(response.body).toMatchObject({
+      statusCode: 400,
+      error: 'Bad Request',
+    });
+
+    expect(response.body.message).toContain(
+      'productName length must be less than 50',
+    );
+    expect(response.body.message).toContain(
+      'productName length must be greater than 1',
+    );
+    expect(response.body.message).toContain(
+      'productName must be a string and length must be less than 50 characters',
+    );
+  });
+
+  it('/products (POST) should throw exception when length of productName is not greater than 1', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/products')
+      .send({ productName: '', price: 100 })
+      .expect(400);
+    expect(response.body).toMatchObject({
+      statusCode: 400,
+      message: ['productName length must be greater than 1'],
+      error: 'Bad Request',
+    });
+  });
+
+  it('/products (POST) should throw exception when length of productName is less than 50', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/products')
+      .send({
+        productName: 'artes artibus artifex artis asperiores aspernandumi',
+        price: 100,
+      })
+      .expect(400);
+    expect(response.body).toMatchObject({
+      statusCode: 400,
+      message: ['productName length must be less than 50'],
       error: 'Bad Request',
     });
   });
